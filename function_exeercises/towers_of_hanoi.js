@@ -1,30 +1,28 @@
 const readline = require("readline");
 
-const reader = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+// const reader = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+// });
 
 class Game {
     constructor(name) {
         this.player = name;
         this.towers = [[1, 2, 3], [], []];
-        // this.reader = readline.createInterface({
-        //     input: process.stdin,
-        //     output: process.stdout
-        // })/;
+        this.reader = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
     }
 
     run() {
-        while (!(this.towers[1].length === 3 || this.towers[2].length === 3)) {
-            this.display();
+        this.display();
+        if (!(this.towers[1].length === 3 || this.towers[2].length === 3)) {
             let move = this.getMove();
-            if (this.valid(move)) {
-                this.makeMove(move);
-            }
+        } else {
+            console.log("Good Job!");
+            this.reader.close();
         }
-        console.log("Good job :)");
-        this.reader.close();
     }
 
     display() {
@@ -32,11 +30,16 @@ class Game {
     }
 
     getMove() {
-        reader.question("Select a column", answer => {
-            reader.question(
+        this.reader.question("Select a column", answer => {
+            this.reader.question(
                 "where would you like to move this to?",
                 answer2 => {
-                    return [parseInt(answer), parseInt(answer2)];
+                    if (this.valid([parseInt(answer), parseInt(answer2)])) {
+                        this.makeMove([parseInt(answer), parseInt(answer2)]);
+                    } else {
+                        console.log("move was invalid");
+                        this.run();
+                    }
                 }
             );
         });
@@ -45,7 +48,6 @@ class Game {
     valid(move) {
         let tower1 = this.towers[move[0]];
         let tower2 = this.towers[move[1]];
-
         if (tower1.length === 0 || tower1[0] > tower2[0]) {
             return false;
         } else {
@@ -56,10 +58,9 @@ class Game {
     makeMove(move) {
         let tower1 = this.towers[move[0]];
         let tower2 = this.towers[move[1]];
-
         let piece = tower1.shift();
-
         tower2.unshift(piece);
+        this.run();
     }
 }
 
